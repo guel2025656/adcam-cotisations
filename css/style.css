@@ -1,0 +1,438 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f5f7fa;
+}
+
+/* ---------- MISE EN PAGE GÉNÉRALE : MENU LATÉRAL + CONTENU ---------- */
+
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 270px;
+  min-width: 270px;
+  background: #003366;
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+/* Petite barre de défilement discrète pour le menu */
+.sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+.sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 3px;
+}
+.sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-entete {
+  padding: 26px 22px 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.sidebar-titre {
+  margin: 0 0 6px;
+  font-size: 24px;
+  font-weight: 700;
+  color: white;
+  letter-spacing: 0.5px;
+}
+
+.sidebar-slogan {
+  margin: 0;
+  font-size: 12px;
+  font-style: italic;
+  color: #a9c2d6;
+  line-height: 1.4;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 14px 10px;
+}
+
+.sidebar-nav ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sidebar-nav a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  border-radius: 10px;
+  color: white;
+  text-decoration: none;
+  font-size: 14px;
+  transition: background-color 0.15s ease;
+}
+
+.sidebar-nav a:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.sidebar-nav a.actif {
+  background-color: rgba(255, 255, 255, 0.16);
+  font-weight: 600;
+}
+
+.sidebar-nav .icone {
+  font-size: 17px;
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.contenu-principal {
+  flex: 1;
+  min-width: 0;
+  padding: 28px;
+}
+
+.vue {
+  display: none;
+}
+
+.vue.visible {
+  display: block;
+}
+
+@media (max-width: 900px) {
+  .app-layout {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    min-width: 0;
+    height: auto;
+    position: relative;
+  }
+
+  .contenu-principal {
+    padding: 16px;
+  }
+}
+
+/* ---------- PAGE SECONDAIRE SANS MENU LATÉRAL ---------- */
+/* Utilisé uniquement par exceptionnelle.html, qui s'ouvre dans sa propre
+   fenêtre et n'a donc pas besoin du menu latéral de la page principale. */
+
+header {
+  background: #003366;
+  color: white;
+  padding: 20px;
+  text-align: center;
+}
+
+header h1 {
+  margin-bottom: 10px;
+}
+
+.container {
+  width: 95%;
+  max-width: 1400px;
+  margin: auto;
+  padding: 20px;
+}
+
+/* ---------- PAGE DE CONNEXION ---------- */
+
+.page-connexion {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.boite-connexion {
+  background: white;
+  width: 100%;
+  max-width: 420px;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  text-align: center;
+}
+
+.form-connexion {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.form-connexion h2 {
+  color: #003366;
+  font-size: 16px;
+  margin-bottom: 4px;
+  text-align: left;
+}
+
+.form-connexion input {
+  width: 100%;
+  min-width: 0;
+}
+
+.message-connexion {
+  font-size: 14px;
+  margin-bottom: 10px;
+  min-height: 0;
+}
+
+.message-connexion.erreur {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+.message-connexion.succes {
+  color: #1e7e34;
+  font-weight: bold;
+}
+
+/* ---------- BANDEAU UTILISATEUR CONNECTÉ (menu latéral) ---------- */
+
+.sidebar-utilisateur {
+  padding: 14px 22px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  font-size: 13px;
+  color: white;
+}
+
+.sidebar-utilisateur .role {
+  display: block;
+  color: #a9c2d6;
+  font-style: italic;
+  margin: 2px 0 8px;
+}
+
+.sidebar-utilisateur button {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 13px;
+  padding: 8px;
+}
+
+.sidebar-utilisateur button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.card {
+  background: white;
+  margin-bottom: 20px;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card h2 {
+  margin-bottom: 15px;
+  color: #003366;
+}
+
+.form-grid {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+input,
+select {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  min-width: 250px;
+}
+
+button {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  color: white;
+  font-weight: bold;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+.file-label {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 15px;
+  border-radius: 5px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.file-label:hover {
+  opacity: 0.9;
+}
+
+.select-label {
+  font-weight: bold;
+  color: #003366;
+}
+
+.btn-ajouter { background: #0066cc; }
+.btn-payer { background: #28a745; }
+.btn-relance { background: #ff9800; }
+.btn-recu { background: #6f42c1; }
+.btn-supprimer { background: #dc3545; }
+.btn-annuler { background: #6c757d; }
+.btn-entree { background: #1e7e34; }
+.btn-depense { background: #a13d3d; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+thead {
+  background: #003366;
+  color: white;
+}
+
+th,
+td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+}
+
+tbody tr:nth-child(even) {
+  background: #f8f8f8;
+}
+
+.dashboard {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+}
+
+.stat {
+  background: #eef4ff;
+  padding: 15px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.stat h3 {
+  color: #003366;
+  margin-bottom: 10px;
+}
+
+.stat p {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.texte-info {
+  text-align: center;
+  color: #666;
+  margin-top: 10px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 5px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.action-buttons button {
+  padding: 7px 10px;
+  font-size: 13px;
+}
+
+.btn-mini {
+  padding: 3px 7px;
+  font-size: 11px;
+  margin-left: 5px;
+}
+
+/* Statut des membres */
+.membre-debiteur {
+  color: #c0392b;
+  font-weight: bold;
+}
+
+.membre-paye {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.tableau-exceptionnelle {
+  margin-top: 15px;
+}
+
+.tableau-exceptionnelle h3 {
+  color: #003366;
+  margin-bottom: 10px;
+}
+
+.rapport-bloc {
+  margin-bottom: 20px;
+}
+
+.rapport-bloc h3 {
+  margin-bottom: 10px;
+}
+
+.rapport-bloc h4,
+.rapport-bloc h5 {
+  color: #003366;
+  margin: 12px 0 6px;
+}
+
+.rapport-totaux {
+  margin-top: 10px;
+  font-weight: bold;
+  color: #003366;
+}
+
+.separateur-rapport {
+  border: none;
+  border-top: 1px solid #ddd;
+  margin: 25px 0;
+}
+
+@media (max-width: 768px) {
+  .form-grid {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  input,
+  select {
+    width: 100%;
+  }
+
+  table {
+    font-size: 12px;
+  }
+}
