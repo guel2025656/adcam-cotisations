@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ADCAM — Connexion</title>
+
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body class="page-connexion">
+
+<div class="boite-connexion">
+
+  <h1 class="sidebar-titre" style="color:#003366;">ADCAM</h1>
+  <p class="texte-info" style="margin-bottom:20px;">
+    Association des Directeurs et Chefs de Service de Méagui
+  </p>
+
+  <div id="zoneMessage" class="message-connexion"></div>
+
+  <form id="formConnexion" class="form-connexion">
+    <h2>Connexion</h2>
+    <input type="email" id="emailConnexion" placeholder="Email" required>
+    <input type="password" id="motDePasseConnexion" placeholder="Mot de passe" required>
+    <button type="submit" class="btn-ajouter">Se connecter</button>
+  </form>
+
+  <hr class="separateur-rapport">
+
+  <form id="formInscription" class="form-connexion">
+    <h2>Première connexion ?</h2>
+    <p class="texte-info">
+      Utilisable uniquement avec l'email fourni par le président de l'association.
+    </p>
+    <input type="email" id="emailInscription" placeholder="Email" required>
+    <input type="password" id="motDePasseInscription" placeholder="Choisissez un mot de passe" required minlength="6">
+    <input type="password" id="confirmationInscription" placeholder="Confirmez le mot de passe" required minlength="6">
+    <button type="submit" class="btn-entree">Créer mon compte</button>
+  </form>
+
+</div>
+
+<script src="js/supabase-client.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/login.js"></script>
+
+</body>
+</html>
