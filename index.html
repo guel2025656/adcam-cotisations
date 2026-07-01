@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ADCAM — Gestion des Cotisations</title>
+
+<link rel="stylesheet" href="css/style.css">
+
+<!-- Connexion à la base de données partagée (Supabase) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- Génération de reçus et rapports PDF côté navigateur -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+</head>
+
+<body>
+
+<div class="app-layout">
+
+  <!-- MENU LATÉRAL -->
+  <aside class="sidebar">
+
+    <div class="sidebar-entete">
+      <h1 class="sidebar-titre">ADCAM</h1>
+      <p class="sidebar-slogan">Association des Directeurs et Chefs de Service de Méagui</p>
+    </div>
+
+    <nav class="sidebar-nav">
+      <ul>
+        <li><a href="#" class="lien-menu actif" data-vue="vue-tableau-de-bord"><span class="icone">🏠</span> Tableau de bord</a></li>
+        <li><a href="#" class="lien-menu" data-vue="vue-membres"><span class="icone">👥</span> Membres</a></li>
+        <li><a href="#" class="lien-menu" data-vue="vue-exceptionnelles"><span class="icone">📌</span> Cotisations exceptionnelles</a></li>
+        <li><a href="#" class="lien-menu" data-vue="vue-historique"><span class="icone">📜</span> Historique</a></li>
+        <li><a href="#" class="lien-menu" data-vue="vue-rapports"><span class="icone">📊</span> Rapports</a></li>
+        <li><a href="#" class="lien-menu" data-vue="vue-entrees"><span class="icone">💰</span> Entrées financières</a></li>
+        <li><a href="#" class="lien-menu" data-vue="vue-depenses"><span class="icone">💸</span> Dépenses</a></li>
+        <li><a href="#" class="lien-menu" data-vue="vue-bilan"><span class="icone">📈</span> Bilan financier</a></li>
+        <li><a href="#" class="lien-menu" data-vue="vue-sauvegarde"><span class="icone">💾</span> Sauvegarde</a></li>
+      </ul>
+    </nav>
+
+    <div class="sidebar-utilisateur" id="sidebarUtilisateur">
+      <span id="nomUtilisateurConnecte">…</span>
+      <span class="role" id="roleUtilisateurConnecte"></span>
+      <button type="button" onclick="seDeconnecter()">Se déconnecter</button>
+    </div>
+
+  </aside>
+
+  <!-- CONTENU PRINCIPAL -->
+  <main class="contenu-principal">
+
+    <!-- TABLEAU DE BORD -->
+    <div class="vue visible" id="vue-tableau-de-bord">
+      <section class="card">
+        <h2>Tableau de bord</h2>
+        <div id="dashboard" class="dashboard">
+          <div class="stat"><h3>Membres</h3><p id="nbMembres">0</p></div>
+          <div class="stat"><h3>Total attendu</h3><p id="totalAttendu">0 FCFA</p></div>
+          <div class="stat"><h3>Total encaissé</h3><p id="totalEncaisse">0 FCFA</p></div>
+          <div class="stat"><h3>Total arriérés</h3><p id="totalArriere">0 FCFA</p></div>
+          <div class="stat"><h3>Débiteurs</h3><p id="nbDebiteurs">0</p></div>
+        </div>
+      </section>
+    </div>
+
+    <!-- MEMBRES -->
+    <div class="vue" id="vue-membres">
+
+      <section class="card">
+        <h2>Ajouter un membre</h2>
+        <form id="formMembre" class="form-grid" data-roles="secretaire,president">
+          <input type="text" id="nom" placeholder="Nom et prénoms" required>
+          <input type="tel" id="telephone" placeholder="Téléphone (ex: 0707070707)" required>
+          <input type="number" id="arriereInitialMembre" placeholder="Arriéré antérieur (FCFA, si déjà membre)" min="0">
+          <button type="submit" class="btn-ajouter">Ajouter</button>
+        </form>
+        <p class="texte-info">
+          Si ce membre était déjà dans l'association avant l'utilisation de cette
+          application, indiquez ici le montant qu'il devait déjà (laisser vide si aucun).
+        </p>
+      </section>
+
+      <section class="card">
+        <h2>Liste des membres</h2>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Matricule</th>
+              <th>Nom</th>
+              <th>Téléphone</th>
+              <th>Payé (mensuel)</th>
+              <th>Arriéré antérieur</th>
+              <th>Arriéré total</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="listeMembres"></tbody>
+        </table>
+
+        <div class="form-grid" style="margin-top:15px;">
+          <button type="button" onclick="exporterMembres()" class="btn-ajouter">Exporter (JSON)</button>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- COTISATIONS EXCEPTIONNELLES -->
+    <div class="vue" id="vue-exceptionnelles">
+      <section class="card">
+        <h2>Cotisations exceptionnelles</h2>
+
+        <form id="formExceptionnelle" class="form-grid" data-roles="tresorier,president">
+          <input type="text" id="libelleException" placeholder="Libellé (ex: Décès, Fête annuelle)" required>
+          <input type="number" id="montantException" placeholder="Montant par membre (FCFA)" min="1" required>
+          <button type="submit" class="btn-ajouter">Créer pour tous les membres</button>
+        </form>
+
+        <p class="texte-info">
+          Chaque cotisation s'ouvre dans sa propre fenêtre : c'est là que se font
+          les encaissements, les relances et les reçus.
+        </p>
+
+        <table style="margin-top:15px;">
+          <thead>
+            <tr>
+              <th>Libellé</th>
+              <th>Montant / membre</th>
+              <th>Créée le</th>
+              <th>Payés</th>
+              <th>Reste à percevoir</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="listeExceptionnelles"></tbody>
+        </table>
+      </section>
+    </div>
+
+    <!-- HISTORIQUE -->
+    <div class="vue" id="vue-historique">
+      <section class="card">
+        <h2>Historique des opérations</h2>
+        <table>
+          <thead>
+            <tr><th>Date</th><th>Membre</th><th>Nature</th><th>Montant</th></tr>
+          </thead>
+          <tbody id="historique"></tbody>
+        </table>
+      </section>
+    </div>
+
+    <!-- RAPPORTS -->
+    <div class="vue" id="vue-rapports">
+      <section class="card">
+        <h2>Rapports</h2>
+
+        <div class="rapport-bloc">
+          <h3>État des cotisations par mois</h3>
+          <div class="form-grid">
+            <select id="selectRapportMois"></select>
+            <button type="button" class="btn-ajouter"
+              onclick="afficherRapportMensuel(document.getElementById('selectRapportMois').value)">
+              Afficher
+            </button>
+            <button type="button" class="btn-recu"
+              onclick="exporterRapportMensuelCSV(document.getElementById('selectRapportMois').value)">
+              Export CSV
+            </button>
+            <button type="button" class="btn-recu"
+              onclick="exporterRapportMensuelPDF(document.getElementById('selectRapportMois').value)">
+              Export PDF
+            </button>
+          </div>
+          <div id="zoneRapportMensuel"></div>
+        </div>
+
+        <hr class="separateur-rapport">
+
+        <div class="rapport-bloc">
+          <h3>État des cotisations par membre</h3>
+          <div class="form-grid">
+            <select id="selectRapportMembre"></select>
+            <button type="button" class="btn-ajouter"
+              onclick="afficherRapportMembre(Number(document.getElementById('selectRapportMembre').value))">
+              Afficher
+            </button>
+            <button type="button" class="btn-recu"
+              onclick="exporterRapportMembreCSV(Number(document.getElementById('selectRapportMembre').value))">
+              Export CSV
+            </button>
+            <button type="button" class="btn-recu"
+              onclick="exporterRapportMembrePDF(Number(document.getElementById('selectRapportMembre').value))">
+              Export PDF
+            </button>
+          </div>
+          <div id="zoneRapportMembre"></div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ENTRÉES FINANCIÈRES DIVERSES -->
+    <div class="vue" id="vue-entrees">
+      <section class="card">
+        <h2>Entrées financières (dons, legs, autres)</h2>
+
+        <form id="formEntree" class="form-grid" data-roles="tresorier,president">
+          <input type="text" id="libelleEntree" placeholder="Libellé (ex: Don de M. X)" required>
+          <select id="categorieEntree">
+            <option value="Don">Don</option>
+            <option value="Legs">Legs</option>
+            <option value="Subvention">Subvention</option>
+            <option value="Autre">Autre</option>
+          </select>
+          <input type="number" id="montantEntree" placeholder="Montant (FCFA)" min="1" required>
+          <input type="date" id="dateEntree" required>
+          <button type="submit" class="btn-entree">Enregistrer l'entrée</button>
+        </form>
+
+        <table style="margin-top:15px;">
+          <thead>
+            <tr><th>Date</th><th>Libellé</th><th>Catégorie</th><th>Montant</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="listeEntrees"></tbody>
+        </table>
+      </section>
+    </div>
+
+    <!-- DÉPENSES -->
+    <div class="vue" id="vue-depenses">
+      <section class="card">
+        <h2>Dépenses</h2>
+
+        <form id="formDepense" class="form-grid" data-roles="tresorier,president">
+          <input type="text" id="objetDepense" placeholder="Objet de la dépense" required>
+          <input type="number" id="montantDepense" placeholder="Montant (FCFA)" min="1" required>
+          <input type="date" id="dateDepense" required>
+          <input type="file" id="recuDepense" accept="image/*,application/pdf">
+          <button type="submit" class="btn-depense">Enregistrer la dépense</button>
+        </form>
+        <p class="texte-info">Le reçu joint (image ou PDF, 2 Mo maximum) reste enregistré dans le navigateur avec la dépense.</p>
+
+        <table style="margin-top:15px;">
+          <thead>
+            <tr><th>Date</th><th>Objet</th><th>Montant</th><th>Reçu</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="listeDepenses"></tbody>
+        </table>
+      </section>
+    </div>
+
+    <!-- BILAN FINANCIER (CAISSE) -->
+    <div class="vue" id="vue-bilan">
+      <section class="card">
+        <h2>Bilan financier (Caisse)</h2>
+        <p class="texte-info">
+          Liste toutes les entrées (cotisations mensuelles, cotisations exceptionnelles,
+          dons/legs/autres) et toutes les dépenses sur la période choisie, puis calcule le solde net.
+        </p>
+
+        <div class="form-grid">
+          <label for="dateDebutBilan">Du</label>
+          <input type="date" id="dateDebutBilan">
+          <label for="dateFinBilan">au</label>
+          <input type="date" id="dateFinBilan">
+          <button type="button" class="btn-ajouter"
+            onclick="afficherBilan(document.getElementById('dateDebutBilan').value, document.getElementById('dateFinBilan').value)">
+            Générer le bilan
+          </button>
+          <button type="button" class="btn-recu"
+            onclick="exporterBilanCSV(document.getElementById('dateDebutBilan').value, document.getElementById('dateFinBilan').value)">
+            Export CSV
+          </button>
+          <button type="button" class="btn-recu"
+            onclick="exporterBilanPDF(document.getElementById('dateDebutBilan').value, document.getElementById('dateFinBilan').value)">
+            Export PDF
+          </button>
+        </div>
+
+        <div id="zoneBilan" style="margin-top:15px;"></div>
+      </section>
+    </div>
+
+    <!-- ARCHIVE / SAUVEGARDE -->
+    <div class="vue" id="vue-sauvegarde">
+      <section class="card">
+        <h2>Archive de consultation</h2>
+        <p class="texte-info">
+          Les données de l'application vivent désormais dans une base partagée
+          (Président, Trésorier, Secrétaire y accèdent tous en temps réel) et sont
+          protégées automatiquement. Ce bouton ne sert qu'à télécharger une copie
+          de consultation/archivage à un instant donné — il n'y a plus de fonction
+          de restauration, pour éviter qu'un fichier ancien n'écrase les données
+          actuelles de tout le monde.
+        </p>
+
+        <div class="form-grid" style="margin-top:15px;">
+          <button type="button" class="btn-ajouter" onclick="exporterSauvegardeComplete()">
+            💾 Télécharger une archive de consultation
+          </button>
+        </div>
+      </section>
+    </div>
+
+  </main>
+
+</div>
+
+<!-- Scripts JS : l'ordre ci-dessous est OBLIGATOIRE -->
+<script src="js/supabase-client.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/membres.js"></script>
+<script src="js/cotisations.js"></script>
+<script src="js/exceptionnelles.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/whatsapp.js"></script>
+<script src="js/recus.js"></script>
+<script src="js/rapports.js"></script>
+<script src="js/caisse.js"></script>
+<script src="js/sauvegarde.js"></script>
+<script src="js/app.js"></script>
+<script src="js/navigation.js"></script>
+
+</body>
+</html>
