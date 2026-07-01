@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ADCAM — Cotisation exceptionnelle</title>
+
+<link rel="stylesheet" href="css/style.css">
+
+<!-- Connexion à la base de données partagée (Supabase) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- Génération de reçus et rapports PDF côté navigateur -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+</head>
+
+<body>
+
+<header>
+  <h1>ADCAM</h1>
+  <h2 id="titreExceptionnelle">Cotisation exceptionnelle</h2>
+</header>
+
+<div class="container">
+
+  <section class="card">
+    <h2>Suivi des paiements</h2>
+    <p class="texte-info">
+      Le nom d'un membre apparaît en vert dès que sa cotisation est réglée.
+    </p>
+    <div id="tableauExceptionnelle"></div>
+  </section>
+
+  <section class="card">
+    <h2>Rapport de cette cotisation</h2>
+    <div id="rapportExceptionnelle"></div>
+
+    <div class="form-grid" style="margin-top:15px;">
+      <button type="button" id="btnExportCSV" class="btn-recu">Export CSV</button>
+      <button type="button" id="btnExportPDF" class="btn-recu">Export PDF</button>
+    </div>
+  </section>
+
+</div>
+
+<!-- Scripts JS : même socle de données que la page principale -->
+<script src="js/supabase-client.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/membres.js"></script>
+<script src="js/cotisations.js"></script>
+<script src="js/exceptionnelles.js"></script>
+<script src="js/whatsapp.js"></script>
+<script src="js/recus.js"></script>
+<script src="js/rapports.js"></script>
+<script src="js/exceptionnelle-fenetre.js"></script>
+
+</body>
+</html>
